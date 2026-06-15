@@ -461,7 +461,7 @@ function renderWeekDots() {
 ═══════════════════════════════════════════════════════ */
 function renderProfile() {
   document.getElementById('profileName').textContent = S.name;
-  document.getElementById('profileLevel').textContent = `Trình độ ${S.level}`;
+  document.getElementById('profileLevel').textContent = `I'm Perfect`;
   document.getElementById('ps-streak').textContent = S.streak;
   document.getElementById('ps-xp').textContent = S.xp;
   document.getElementById('ps-learned').textContent = S.learnedWords.length;
