@@ -1,1006 +1,281 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ English Daily — học cùng nhau</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --rose: #FF6B9D;
-    --rose-light: #FFE4EF;
-    --rose-dark: #C94B78;
-    --mint: #4ECDC4;
-    --mint-light: #E0F7F6;
-    --amber: #FFB347;
-    --amber-light: #FFF3E0;
-    --purple: #A78BFA;
-    --purple-light: #EDE9FE;
-    --bg: #FFF8FA;
-    --card: #FFFFFF;
-    --text: #2D1B33;
-    --text-2: #7C5C85;
-    --text-3: #B39BBB;
-    --border: rgba(200,150,180,0.18);
-    --shadow: 0 4px 24px rgba(199,100,140,0.10);
-    --radius: 20px;
-    --radius-sm: 12px;
-  }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  /* ——— SETUP SCREEN ——— */
-  #setupScreen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    background: linear-gradient(135deg, #FFF0F5 0%, #F0F0FF 50%, #F0FFF8 100%);
-  }
-  .setup-card {
-    background: white;
-    border-radius: 28px;
-    padding: 2.5rem;
-    max-width: 440px;
-    width: 100%;
-    box-shadow: 0 8px 48px rgba(199,100,140,0.15);
-    text-align: center;
-  }
-  .setup-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
-  .setup-card h1 { font-size: 1.6rem; font-weight: 900; color: var(--text); margin-bottom: 0.3rem; }
-  .setup-card p { color: var(--text-2); font-size: 0.95rem; margin-bottom: 1.5rem; }
-  .setup-card label { display: block; text-align: left; font-size: 0.85rem; font-weight: 700; color: var(--text-2); margin-bottom: 0.3rem; margin-top: 1rem; }
-  .setup-card input {
-    width: 100%; padding: 0.75rem 1rem;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    background: #FAFAFA;
-  }
-  .setup-card input:focus { border-color: var(--rose); background: white; }
-  .setup-card input[type="password"] { letter-spacing: 0.15em; }
-  .api-note { font-size: 0.78rem; color: var(--text-3); margin-top: 0.4rem; text-align: left; }
-  .api-note a { color: var(--rose); text-decoration: none; }
-
-  /* ——— MAIN APP ——— */
-  #app { display: none; max-width: 520px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
-
-  /* Header */
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 1.2rem;
-  }
-  .header-left h2 { font-size: 1.1rem; font-weight: 900; }
-  .header-left span { font-size: 0.8rem; color: var(--text-2); }
-  .streak-badge {
-    display: flex; align-items: center; gap: 6px;
-    background: linear-gradient(135deg, #FF6B9D, #FFB347);
-    color: white;
-    font-weight: 800; font-size: 0.95rem;
-    padding: 0.45rem 1rem;
-    border-radius: 999px;
-    box-shadow: 0 3px 12px rgba(255,107,157,0.35);
-  }
-
-  /* Progress */
-  .progress-wrap { margin-bottom: 1rem; }
-  .progress-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-2); margin-bottom: 0.4rem; font-weight: 600; }
-  .progress-track { height: 8px; background: #F0E8F4; border-radius: 99px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--rose), var(--amber)); transition: width 0.4s ease; }
-
-  /* Topic tabs */
-  .tabs { display: flex; gap: 8px; margin-bottom: 1.2rem; overflow-x: auto; padding-bottom: 4px; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    white-space: nowrap; padding: 0.4rem 0.9rem;
-    border-radius: 999px; border: 1.5px solid var(--border);
-    background: white; font-family: 'Nunito', sans-serif;
-    font-size: 0.82rem; font-weight: 700; color: var(--text-2);
-    cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-  }
-  .tab-btn.active { background: var(--rose); border-color: var(--rose); color: white; box-shadow: 0 3px 10px rgba(255,107,157,0.3); }
-
-  /* Card */
-  .card-scene { perspective: 1000px; height: 340px; margin-bottom: 1rem; cursor: pointer; }
-  .card-inner {
-    width: 100%; height: 100%; position: relative;
-    transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(.4,0,.2,1);
-  }
-  .card-inner.flipped { transform: rotateY(180deg); }
-  .card-face {
-    position: absolute; inset: 0;
-    backface-visibility: hidden;
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    display: flex; flex-direction: column;
-  }
-  .card-front { background: white; }
-  .card-back { background: white; transform: rotateY(180deg); }
-
-  .card-img-wrap { width: 100%; height: 160px; overflow: hidden; position: relative; flex-shrink: 0; }
-  .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-  .card-img-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, rgba(45,27,51,0.45) 100%);
-  }
-  .card-type-badge {
-    position: absolute; top: 10px; left: 12px;
-    background: rgba(255,255,255,0.92);
-    border-radius: 999px; padding: 3px 10px;
-    font-size: 0.7rem; font-weight: 800;
-    color: var(--rose-dark); backdrop-filter: blur(4px);
-  }
-  .card-body { padding: 1rem 1.25rem 1rem; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-  .card-word { font-size: 1.8rem; font-weight: 900; color: var(--text); line-height: 1.2; }
-  .card-phonetic { font-size: 0.9rem; color: var(--rose); font-weight: 600; margin-top: 2px; }
-  .card-pos { font-size: 0.75rem; color: var(--text-3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
-  .card-hint { font-size: 0.82rem; color: var(--text-3); margin-top: 0.5rem; display: flex; align-items: center; gap: 4px; }
-
-  /* Back face */
-  .back-header {
-    padding: 1rem 1.25rem 0.5rem;
-    border-bottom: 1px solid #F5EEF8;
-  }
-  .back-word { font-size: 1.3rem; font-weight: 900; color: var(--rose-dark); }
-  .back-phonetic { font-size: 0.82rem; color: var(--text-3); }
-  .back-meaning { font-size: 1.05rem; font-weight: 700; color: var(--text); }
-  .back-vi { font-size: 0.88rem; color: var(--text-2); margin-top: 2px; }
-  .back-body { padding: 0.75rem 1.25rem; flex: 1; overflow-y: auto; }
-  .example-box {
-    background: var(--rose-light);
-    border-radius: var(--radius-sm);
-    padding: 0.6rem 0.85rem;
-    margin-bottom: 0.5rem;
-  }
-  .example-box .en { font-size: 0.88rem; color: var(--rose-dark); font-weight: 600; font-style: italic; }
-  .example-box .vi { font-size: 0.8rem; color: var(--text-2); margin-top: 2px; }
-  .note-box {
-    background: var(--mint-light);
-    border-radius: var(--radius-sm);
-    padding: 0.55rem 0.85rem;
-    font-size: 0.8rem; color: #2A7A74; font-weight: 600;
-  }
-  .grammar-box { padding: 1rem 1.25rem; flex: 1; overflow-y: auto; }
-  .grammar-title { font-size: 1rem; font-weight: 800; color: var(--purple); margin-bottom: 0.5rem; }
-  .grammar-rule {
-    background: var(--purple-light);
-    border-radius: var(--radius-sm);
-    padding: 0.65rem 0.85rem;
-    font-size: 0.85rem; color: #4C3B8A;
-    line-height: 1.6; margin-bottom: 0.5rem;
-  }
-  .grammar-example {
-    background: #F8F9FF;
-    border-left: 3px solid var(--purple);
-    border-radius: 0 8px 8px 0;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.82rem; color: var(--text-2);
-    margin-bottom: 0.4rem; font-style: italic;
-  }
-
-  .flip-hint {
-    text-align: center; font-size: 0.75rem; color: var(--text-3);
-    margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 4px;
-  }
-
-  /* Buttons */
-  .btn-row { display: flex; gap: 10px; margin-bottom: 1rem; }
-  .btn {
-    flex: 1; padding: 0.75rem;
-    border-radius: var(--radius-sm); border: none;
-    font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 800;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-know { background: #DCFCE7; color: #166534; }
-  .btn-know:hover { background: #BBF7D0; transform: translateY(-1px); }
-  .btn-review { background: #FEF3C7; color: #92400E; }
-  .btn-review:hover { background: #FDE68A; transform: translateY(-1px); }
-  .btn-skip { background: #F1F5F9; color: #64748B; }
-  .btn-skip:hover { background: #E2E8F0; }
-
-  .nav-row { display: flex; align-items: center; justify-content: space-between; }
-  .nav-btn {
-    padding: 0.5rem 1.2rem;
-    border-radius: 999px; border: 1.5px solid var(--border);
-    background: white; font-family: 'Nunito', sans-serif;
-    font-size: 0.85rem; font-weight: 700; color: var(--text-2);
-    cursor: pointer; transition: all 0.2s;
-  }
-  .nav-btn:hover:not(:disabled) { border-color: var(--rose); color: var(--rose); }
-  .nav-btn:disabled { opacity: 0.3; cursor: default; }
-  .card-counter { font-size: 0.82rem; color: var(--text-3); font-weight: 700; }
-
-  /* Loading */
-  .loading-card {
-    background: white; border-radius: var(--radius);
-    box-shadow: var(--shadow); height: 340px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 1rem; margin-bottom: 1rem;
-  }
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--rose-light);
-    border-top-color: var(--rose);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { color: var(--text-2); font-size: 0.9rem; font-weight: 700; }
-
-  /* Completion */
-  .completion-card {
-    background: white; border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 2rem;
-    text-align: center; margin-bottom: 1rem;
-  }
-  .completion-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
-  .completion-card h3 { font-size: 1.3rem; font-weight: 900; color: var(--text); }
-  .completion-card p { color: var(--text-2); font-size: 0.9rem; margin-top: 0.3rem; }
-  .stats-row { display: flex; gap: 10px; margin-top: 1.2rem; }
-  .stat-box {
-    flex: 1; background: var(--bg); border-radius: var(--radius-sm);
-    padding: 0.8rem; text-align: center;
-  }
-  .stat-box .num { font-size: 1.5rem; font-weight: 900; }
-  .stat-box .lbl { font-size: 0.72rem; color: var(--text-2); font-weight: 700; }
-  .btn-refresh {
-    margin-top: 1.2rem; width: 100%;
-    padding: 0.85rem; background: linear-gradient(135deg, var(--rose), var(--amber));
-    color: white; border: none; border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 800;
-    cursor: pointer; box-shadow: 0 4px 16px rgba(255,107,157,0.3);
-    transition: all 0.2s;
-  }
-  .btn-refresh:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,157,0.4); }
-
-  /* Calendar streak */
-  .streak-section {
-    background: white; border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 1.1rem 1.25rem;
-    margin-bottom: 1rem;
-  }
-  .streak-section h3 { font-size: 0.9rem; font-weight: 800; margin-bottom: 0.75rem; color: var(--text); }
-  .calendar-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-  }
-  .cal-day {
-    aspect-ratio: 1; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.68rem; font-weight: 700;
-  }
-  .cal-day.done { background: linear-gradient(135deg, var(--rose), var(--amber)); color: white; }
-  .cal-day.today { background: var(--rose-light); color: var(--rose-dark); border: 2px solid var(--rose); }
-  .cal-day.empty { background: #F7F0F9; color: var(--text-3); }
-  .cal-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
-  .cal-header span { text-align: center; font-size: 0.65rem; color: var(--text-3); font-weight: 700; }
-
-  /* Settings gear */
-  .settings-btn {
-    background: none; border: none; font-size: 1.1rem; cursor: pointer;
-    padding: 4px; border-radius: 8px; color: var(--text-3);
-    transition: color 0.2s;
-  }
-  .settings-btn:hover { color: var(--rose); }
-
-  /* Settings modal */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(45,27,51,0.45); z-index: 100;
-    align-items: center; justify-content: center; padding: 1rem;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: white; border-radius: var(--radius);
-    padding: 1.5rem; max-width: 400px; width: 100%;
-    box-shadow: 0 16px 64px rgba(45,27,51,0.25);
-  }
-  .modal h3 { font-size: 1.1rem; font-weight: 900; margin-bottom: 1rem; }
-  .modal label { font-size: 0.82rem; font-weight: 700; color: var(--text-2); display: block; margin-bottom: 0.3rem; }
-  .modal input {
-    width: 100%; padding: 0.65rem 0.9rem;
-    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif; font-size: 0.9rem; margin-bottom: 0.9rem;
-  }
-  .modal-btns { display: flex; gap: 8px; }
-  .modal-btns button {
-    flex: 1; padding: 0.65rem;
-    border-radius: var(--radius-sm); border: none;
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.88rem;
-    cursor: pointer;
-  }
-  .btn-save { background: var(--rose); color: white; }
-  .btn-cancel { background: #F1F5F9; color: var(--text-2); }
-
-  /* No API mode banner */
-  .no-api-banner {
-    background: var(--amber-light); border: 1.5px solid var(--amber);
-    border-radius: var(--radius-sm); padding: 0.65rem 1rem;
-    font-size: 0.8rem; color: #7C4A03; font-weight: 600;
-    margin-bottom: 1rem; display: none;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Daily 🦉</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
-<div id="setupScreen">
-  <div class="setup-card">
-    <div class="setup-emoji">🌸</div>
-    <h1>English Daily</h1>
-    <p>5–10 phút mỗi ngày, học cùng nhau nhé 💕</p>
-
-    <label>Tên của bạn</label>
-    <input type="text" id="setupName" placeholder="VD: Linh, Hana, ..." />
-
-    <label>Anthropic API Key <span style="color:var(--text-3);font-weight:400">(để nhận từ vựng mới mỗi ngày)</span></label>
-    <input type="password" id="setupApiKey" placeholder="sk-ant-..." />
-    <p class="api-note">Lấy miễn phí tại <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> — key lưu trên máy, không gửi đâu cả ✓</p>
-
-    <button class="btn-refresh" style="margin-top:1.5rem" onclick="startApp()">Bắt đầu học 🚀</button>
-  </div>
-</div>
-
-<!-- MAIN APP -->
-<div id="app">
-  <div class="header">
-    <div class="header-left">
-      <h2 id="greetName">✨ English Daily</h2>
-      <span id="todayDate"></span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="streak-badge" id="streakBadge">🔥 0</div>
-      <button class="settings-btn" onclick="openSettings()" title="Cài đặt">⚙️</button>
-    </div>
-  </div>
-
-  <div class="no-api-banner" id="noApiBanner">
-    ⚡ Đang dùng bộ từ vựng nội bộ — thêm API key để nhận nội dung mới mỗi ngày!
-  </div>
-
-  <div class="tabs" id="topicTabs">
-    <button class="tab-btn active" onclick="setTopic('all')">✨ Tất cả</button>
-    <button class="tab-btn" onclick="setTopic('vocab')">📖 Từ vựng</button>
-    <button class="tab-btn" onclick="setTopic('grammar')">📝 Ngữ pháp</button>
-    <button class="tab-btn" onclick="setTopic('phrase')">💬 Cụm từ</button>
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span id="progLabel">Tiến độ hôm nay</span>
-      <span id="progPct">0%</span>
-    </div>
-    <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
-  </div>
-
-  <div id="cardArea"></div>
-
-  <div class="btn-row" id="actionBtns" style="display:none">
-    <button class="btn btn-know" onclick="mark('know')">✓ Nhớ rồi</button>
-    <button class="btn btn-review" onclick="mark('review')">↺ Xem lại</button>
-    <button class="btn btn-skip" onclick="nextCard()">→ Bỏ qua</button>
-  </div>
-
-  <div class="nav-row">
-    <button class="nav-btn" id="prevBtn" onclick="prevCard()">← Trước</button>
-    <span class="card-counter" id="cardCounter"></span>
-    <button class="nav-btn" id="nextBtn" onclick="nextCard()">Tiếp →</button>
-  </div>
-
-  <div style="height:1.5rem"></div>
-
-  <div class="streak-section">
-    <h3>📅 Lịch học tháng này</h3>
-    <div class="cal-header">
-      <span>CN</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span>
-    </div>
-    <div class="calendar-grid" id="calGrid"></div>
-  </div>
-</div>
-
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settingsModal">
-  <div class="modal">
-    <h3>⚙️ Cài đặt</h3>
-    <label>Tên</label>
-    <input type="text" id="editName" />
-    <label>API Key</label>
-    <input type="password" id="editKey" placeholder="sk-ant-..." />
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeSettings()">Hủy</button>
-      <button class="btn-save" onclick="saveSettings()">Lưu</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ——— STATE ———
-let state = {
-  name: '',
-  apiKey: '',
-  streak: 0,
-  lastStudyDate: '',
-  studiedDates: [],
-  cards: [],
-  idx: 0,
-  flipped: false,
-  topic: 'all',
-  sessionKnow: 0,
-  sessionReview: 0,
-  sessionDone: false,
-  todayFetched: '',
-};
-
-// ——— FALLBACK CARDS (khi không có API) ———
-const FALLBACK_CARDS = [
-  {
-    type: 'vocab', word: 'Nervous', phonetic: '/ˈnɜːvəs/',
-    pos: 'adjective', meaning: 'Feeling worried or anxious', vi: 'Lo lắng, hồi hộp',
-    examples: [
-      { en: "I felt nervous before the exam.", vi: "Tôi cảm thấy hồi hộp trước kỳ thi." },
-      { en: "She gets nervous when speaking in public.", vi: "Cô ấy hay hồi hộp khi nói trước đám đông." }
-    ],
-    note: "Nervous ≠ angry! Người Việt hay nhầm với 'upset'. Nervous = hồi hộp/lo, upset = buồn/khó chịu.",
-    img: 'worried person thinking',
-  },
-  {
-    type: 'grammar', word: 'Present Simple vs Continuous', phonetic: '',
-    pos: 'grammar', meaning: 'V / am-is-are + V-ing', vi: 'Hiện tại đơn vs Hiện tại tiếp diễn',
-    rule: 'Simple: thói quen, sự thật hiển nhiên (every day, always, usually). Continuous: đang xảy ra ngay lúc nói (now, right now, at the moment).',
-    examples: [
-      { en: "I drink coffee every morning.", vi: "Tôi uống cà phê mỗi sáng. (thói quen)" },
-      { en: "I am drinking coffee right now.", vi: "Tôi đang uống cà phê lúc này. (đang xảy ra)" },
-      { en: "She works at a hospital.", vi: "Cô ấy làm việc ở bệnh viện. (sự thật)" }
-    ],
-    keywords: ['always / usually / often → Simple | now / right now / at the moment → Continuous'],
-    img: 'daily routine schedule',
-  },
-  {
-    type: 'vocab', word: 'Borrow vs Lend', phonetic: '/ˈbɒrəʊ/ vs /lɛnd/',
-    pos: 'verb', meaning: 'Borrow = take from sb | Lend = give to sb', vi: 'Borrow = mượn | Lend = cho mượn',
-    examples: [
-      { en: "Can I borrow your pen?", vi: "Tôi có thể mượn bút của bạn không?" },
-      { en: "She lent me her umbrella.", vi: "Cô ấy cho tôi mượn ô của cô ấy." }
-    ],
-    note: "Mẹo nhớ: Borrow = B = bạn nhận về. Lend = L = let someone have it (bạn đưa đi).",
-    img: 'two friends sharing book',
-  },
-  {
-    type: 'phrase', word: 'Take it easy', phonetic: '/teɪk ɪt ˈiːzi/',
-    pos: 'phrase', meaning: 'Relax / Don\'t worry / Goodbye (casual)', vi: 'Thư giãn đi / Đừng lo / Tạm biệt (thân mật)',
-    examples: [
-      { en: "Take it easy, the exam isn't that hard!", vi: "Thư giãn đi, bài thi không khó đến vậy đâu!" },
-      { en: "See you tomorrow — take it easy!", vi: "Hẹn gặp lại ngày mai — bảo trọng nhé!" }
-    ],
-    note: "Câu này dùng được trong 3 tình huống: an ủi ai đó, tạm biệt thân mật, hoặc bảo ai bình tĩnh lại.",
-    img: 'relaxing coffee cafe',
-  },
-  {
-    type: 'vocab', word: 'Suggest', phonetic: '/səˈdʒɛst/',
-    pos: 'verb', meaning: 'To mention an idea for someone to consider', vi: 'Đề xuất, gợi ý',
-    examples: [
-      { en: "I suggest going to the cinema tonight.", vi: "Tôi đề xuất đi xem phim tối nay." },
-      { en: "She suggested that we take a break.", vi: "Cô ấy gợi ý rằng chúng ta nên nghỉ ngơi." }
-    ],
-    note: "Lỗi hay gặp: KHÔNG nói 'I suggest you to go'. Đúng là 'I suggest going' hoặc 'I suggest (that) you go'.",
-    img: 'lightbulb idea suggestion',
-  },
-  {
-    type: 'grammar', word: 'Past Simple', phonetic: '',
-    pos: 'grammar', meaning: 'V-ed (regular) / V2 (irregular)', vi: 'Thì quá khứ đơn',
-    rule: 'Dùng cho hành động ĐÃ HOÀN THÀNH trong quá khứ, có thời gian xác định. Dấu hiệu: yesterday, last week, ago, in 2020.',
-    examples: [
-      { en: "I watched a movie last night.", vi: "Tối qua tôi đã xem một bộ phim." },
-      { en: "She went to Hanoi two days ago.", vi: "Hai ngày trước cô ấy đã đi Hà Nội." },
-      { en: "Did you eat breakfast this morning?", vi: "Sáng nay bạn có ăn sáng không?" }
-    ],
-    keywords: ['yesterday / last... / ...ago / in + năm → Past Simple'],
-    img: 'calendar past memory',
-  },
-  {
-    type: 'vocab', word: 'Exhausted', phonetic: '/ɪɡˈzɔːstɪd/',
-    pos: 'adjective', meaning: 'Extremely tired', vi: 'Kiệt sức, mệt lả',
-    examples: [
-      { en: "I was exhausted after work.", vi: "Tôi kiệt sức sau giờ làm." },
-      { en: "She looks exhausted — she should rest.", vi: "Trông cô ấy mệt lả rồi — cô ấy nên nghỉ ngơi." }
-    ],
-    note: "Thang độ mệt: tired (mệt) → very tired → exhausted (kiệt sức hoàn toàn). Dùng exhausted mạnh hơn nhiều!",
-    img: 'tired person resting sofa',
-  },
-  {
-    type: 'phrase', word: 'By the way', phonetic: '/baɪ ðə weɪ/',
-    pos: 'phrase', meaning: 'Used to introduce a new topic casually', vi: 'Nhân tiện, à này, à mà',
-    examples: [
-      { en: "By the way, did you hear about the new café?", vi: "Nhân tiện, bạn có nghe về quán cà phê mới không?" },
-      { en: "By the way, I forgot to tell you something.", vi: "À mà, tôi quên nói với bạn điều này." }
-    ],
-    note: "Viết tắt hay thấy trên mạng: BTW. Dùng khi muốn đổi chủ đề hoặc thêm thông tin không liên quan.",
-    img: 'friends casual conversation',
-  },
-  {
-    type: 'vocab', word: 'Afford', phonetic: '/əˈfɔːd/',
-    pos: 'verb', meaning: 'To have enough money or time for something', vi: 'Đủ khả năng (tiền/thời gian) để làm gì',
-    examples: [
-      { en: "I can't afford a new phone right now.", vi: "Hiện tại tôi không đủ tiền mua điện thoại mới." },
-      { en: "We can't afford to waste time.", vi: "Chúng ta không có thời gian để lãng phí." }
-    ],
-    note: "Afford không chỉ nói về tiền — còn nói về thời gian, cơ hội. 'I can't afford to lose this job' = không thể để mất việc.",
-    img: 'wallet money budget',
-  },
-  {
-    type: 'phrase', word: 'Make up your mind', phonetic: '/meɪk ʌp jɔː maɪnd/',
-    pos: 'idiom', meaning: 'To make a decision', vi: 'Đưa ra quyết định, quyết định đi',
-    examples: [
-      { en: "Just make up your mind — coffee or tea?", vi: "Quyết định đi — cà phê hay trà?" },
-      { en: "I can't make up my mind about the job offer.", vi: "Tôi không thể quyết định về lời đề nghị việc làm đó." }
-    ],
-    note: "Cụm này rất thông dụng khi ai đó đang do dự mãi. 'Have you made up your mind yet?' = Bạn quyết định chưa?",
-    img: 'decision choice crossroads',
-  },
-];
-
-// Unsplash-style image keywords mapped to topics
-const IMG_KEYWORDS = {
-  clock: 'minimal clock time',
-  grammar: 'open book study desk',
-  speech: 'microphone speaking stage',
-  decision: 'crossroads path choice',
-  strength: 'mountain peak sunrise',
-  social: 'friends laughing coffee',
-  detail: 'magnifying glass focus',
-  success: 'goal achievement celebration',
-};
-
-function getUnsplashUrl(keyword) {
-  const encoded = encodeURIComponent(keyword);
-  // Use picsum with deterministic seed based on keyword for consistent images
-  const seed = keyword.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  return `https://picsum.photos/seed/${seed}/520/160`;
-}
-
-// ——— LOAD / SAVE ———
-function load() {
-  try {
-    const s = localStorage.getItem('englishDaily_v2');
-    if (s) Object.assign(state, JSON.parse(s));
-  } catch(e) {}
-}
-
-function save() {
-  const toSave = {
-    name: state.name, apiKey: state.apiKey,
-    streak: state.streak, lastStudyDate: state.lastStudyDate,
-    studiedDates: state.studiedDates, todayFetched: state.todayFetched,
-    cachedCards: state.cards,
-  };
-  localStorage.setItem('englishDaily_v2', JSON.stringify(toSave));
-}
-
-// ——— SETUP ———
-function startApp() {
-  const name = document.getElementById('setupName').value.trim();
-  const key = document.getElementById('setupApiKey').value.trim();
-  if (!name) { alert('Nhập tên vào nhé! 🌸'); return; }
-  state.name = name;
-  state.apiKey = key;
-  save();
-  showApp();
-}
-
-function showApp() {
-  document.getElementById('setupScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  initApp();
-}
-
-// ——— INIT ———
-async function initApp() {
-  const today = getTodayStr();
-  updateStreak(today);
-  updateHeader();
-  renderCalendar();
-
-  // Load or fetch cards
-  const s = localStorage.getItem('englishDaily_v2');
-  const saved = s ? JSON.parse(s) : {};
-  if (saved.todayFetched === today && saved.cachedCards && saved.cachedCards.length > 0) {
-    state.cards = saved.cachedCards;
-    renderCard();
-  } else {
-    await fetchDailyCards();
-  }
-}
-
-// ——— STREAK ———
-function getTodayStr() {
-  return new Date().toISOString().slice(0,10);
-}
-
-function updateStreak(today) {
-  const last = state.lastStudyDate;
-  if (last === today) return;
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = yesterday.toISOString().slice(0,10);
-  if (last === yStr) {
-    state.streak = (state.streak || 0) + 1;
-  } else if (last !== today) {
-    // Don't reset streak on opening, only when session completes
-  }
-}
-
-function markTodayStudied() {
-  const today = getTodayStr();
-  if (!state.studiedDates.includes(today)) {
-    state.studiedDates.push(today);
-    const last = state.lastStudyDate;
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yStr = yesterday.toISOString().slice(0,10);
-    if (last === yStr || !last) {
-      state.streak = (state.streak || 0) + 1;
-    } else if (last !== today) {
-      state.streak = 1;
-    }
-    state.lastStudyDate = today;
-    save();
-    updateHeader();
-    renderCalendar();
-  }
-}
-
-function updateHeader() {
-  const name = state.name || 'bạn';
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? 'Chào buổi sáng' : hour < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
-  document.getElementById('greetName').textContent = `${greet}, ${name} 🌸`;
-  const today = new Date();
-  document.getElementById('todayDate').textContent = today.toLocaleDateString('vi-VN', {weekday:'long', day:'numeric', month:'long'});
-  document.getElementById('streakBadge').textContent = `🔥 ${state.streak || 0} ngày`;
-}
-
-// ——— CALENDAR ———
-function renderCalendar() {
-  const grid = document.getElementById('calGrid');
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  let html = '';
-  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday = d === today.getDate();
-    const isDone = state.studiedDates.includes(dateStr);
-    const cls = isDone ? 'done' : isToday ? 'today' : 'empty';
-    html += `<div class="cal-day ${cls}">${d}</div>`;
-  }
-  grid.innerHTML = html;
-}
-
-// ——— FETCH CARDS FROM API ———
-async function fetchDailyCards() {
-  showLoading();
-  if (!state.apiKey) {
-    document.getElementById('noApiBanner').style.display = 'block';
-    state.cards = [...FALLBACK_CARDS].sort(() => Math.random() - 0.5);
-    state.todayFetched = getTodayStr();
-    save();
-    state.idx = 0; state.sessionKnow = 0; state.sessionReview = 0; state.sessionDone = false;
-    renderCard();
-    return;
-  }
-
-  try {
-    const today = new Date().toLocaleDateString('vi-VN', {weekday:'long', day:'numeric', month:'long'});
-    const prompt = `Hôm nay là ${today}. Tạo bộ 10 flashcard tiếng Anh cho người học trình độ A2-B1 (đã học nhưng cần ôn lại, không mất gốc hoàn toàn), phù hợp học 5-10 phút. Mix: 5 từ vựng thông dụng trong cuộc sống hàng ngày, 2 ngữ pháp cơ bản-trung cấp hay dùng, 3 cụm từ/idiom đơn giản dễ nhớ. Từ vựng chọn loại quen thuộc nhưng hay quên, ngữ pháp tập trung vào lỗi phổ biến của người Việt. 
-
-Trả về JSON array với format sau (KHÔNG có markdown, chỉ JSON thuần):
-[
-  {
-    "type": "vocab",
-    "word": "...",
-    "phonetic": "/.../ ",
-    "pos": "noun/verb/adj/adv",
-    "meaning": "English definition",
-    "vi": "Nghĩa tiếng Việt",
-    "examples": [{"en":"...","vi":"..."},{"en":"...","vi":"..."}],
-    "note": "Mẹo nhớ hoặc thông tin thú vị (tiếng Việt)",
-    "img": "2-3 từ tiếng Anh mô tả hình ảnh minh họa phù hợp"
-  },
-  {
-    "type": "grammar",
-    "word": "Tên cấu trúc",
-    "phonetic": "",
-    "pos": "grammar",
-    "meaning": "Công thức",
-    "vi": "Tên tiếng Việt",
-    "rule": "Giải thích khi nào dùng (tiếng Việt, ngắn gọn)",
-    "examples": [{"en":"...","vi":"..."},{"en":"...","vi":"..."},{"en":"...","vi":"..."}],
-    "keywords": ["từ/cụm từ hay đi kèm"],
-    "img": "2-3 từ tiếng Anh cho hình minh họa"
-  },
-  {
-    "type": "phrase",
-    "word": "Cụm từ/idiom",
-    "phonetic": "/.../ ",
-    "pos": "idiom/phrase",
-    "meaning": "Nghĩa tiếng Anh",
-    "vi": "Nghĩa tiếng Việt",
-    "examples": [{"en":"...","vi":"..."},{"en":"...","vi":"..."}],
-    "note": "Nguồn gốc hoặc cách dùng thú vị (tiếng Việt)",
-    "img": "2-3 từ tiếng Anh cho hình minh họa"
-  }
-]`;
-
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': state.apiKey, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    if (!resp.ok) throw new Error(`API ${resp.status}`);
-    const data = await resp.json();
-    const text = data.content[0].text;
-    const clean = text.replace(/```json|```/g,'').trim();
-    const cards = JSON.parse(clean);
-    state.cards = cards;
-    state.todayFetched = getTodayStr();
-    document.getElementById('noApiBanner').style.display = 'none';
-    save();
-  } catch(e) {
-    console.error(e);
-    document.getElementById('noApiBanner').style.display = 'block';
-    state.cards = [...FALLBACK_CARDS].sort(() => Math.random() - 0.5);
-    state.todayFetched = getTodayStr();
-    save();
-  }
-
-  state.idx = 0; state.sessionKnow = 0; state.sessionReview = 0; state.sessionDone = false;
-  renderCard();
-}
-
-// ——— RENDER ———
-function showLoading() {
-  document.getElementById('cardArea').innerHTML = `
-    <div class="loading-card">
-      <div class="spinner"></div>
-      <div class="loading-text">Đang chuẩn bị bài học hôm nay... ✨</div>
-    </div>`;
-  document.getElementById('actionBtns').style.display = 'none';
-  document.getElementById('cardCounter').textContent = '';
-}
-
-function getFilteredCards() {
-  if (state.topic === 'all') return state.cards;
-  return state.cards.filter(c => c.type === state.topic);
-}
-
-function renderCard() {
-  const cards = getFilteredCards();
-  if (!cards.length) {
-    document.getElementById('cardArea').innerHTML = '<div class="loading-card"><div class="loading-text">Không có thẻ nào 🌸</div></div>';
-    document.getElementById('actionBtns').style.display = 'none';
-    return;
-  }
-
-  const total = cards.length;
-  const done = state.sessionKnow + state.sessionReview;
-  const pct = Math.round((done / total) * 100);
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('progPct').textContent = pct + '%';
-
-  if (state.idx >= cards.length) {
-    showCompletion();
-    return;
-  }
-
-  const c = cards[state.idx];
-  const imgUrl = c.img ? getUnsplashUrl(c.img) : getUnsplashUrl(c.word);
-
-  const typeLabel = c.type === 'vocab' ? '📖 Từ vựng' : c.type === 'grammar' ? '📝 Ngữ pháp' : '💬 Cụm từ';
-  const typePosColor = c.type === 'grammar' ? 'var(--purple)' : c.type === 'phrase' ? 'var(--mint)' : 'var(--rose)';
-
-  // Front face
-  let frontBody = `
-    <div class="card-body">
-      <div class="card-word">${c.word}</div>
-      ${c.phonetic ? `<div class="card-phonetic">${c.phonetic}</div>` : ''}
-      <div class="card-pos" style="color:${typePosColor}">${c.pos || c.type}</div>
-      ${c.type === 'grammar'
-        ? `<div class="card-hint" style="margin-top:0.6rem;font-size:0.88rem;color:var(--text-2)">💡 ${c.meaning}</div>`
-        : `<div class="card-hint">🤔 Bạn có nhớ nghĩa không?</div>`
-      }
-    </div>`;
-
-  // Back face
-  let backContent = '';
-  if (c.type === 'grammar') {
-    backContent = `
-      <div class="back-header">
-        <div class="back-word">${c.word}</div>
-        <div class="back-phonetic">${c.meaning}</div>
-        <div class="back-vi" style="margin-top:4px">${c.vi}</div>
+  <!-- ═══════════════════════════════════
+       SCREEN: HOME
+  ═══════════════════════════════════ -->
+  <div id="screen-home" class="screen active">
+    <header class="home-header">
+      <div class="owl-logo">🦉</div>
+      <div class="header-stats">
+        <div class="stat-pill flame">🔥 <span id="home-streak">0</span></div>
+        <div class="stat-pill star">⭐ <span id="home-xp">0</span> XP</div>
+        <div class="stat-pill heart">❤️ <span id="home-hearts">5</span></div>
       </div>
-      <div class="grammar-box">
-        <div class="grammar-title">📌 Khi nào dùng?</div>
-        <div class="grammar-rule">${c.rule || ''}</div>
-        <div class="grammar-title" style="margin-top:0.75rem">✏️ Ví dụ</div>
-        ${(c.examples||[]).map(e=>`<div class="grammar-example">${e.en}<br><span style="color:var(--text-3);font-style:normal">${e.vi}</span></div>`).join('')}
-        ${c.keywords && c.keywords.length ? `<div class="note-box" style="margin-top:0.5rem">🔑 ${c.keywords.join(' · ')}</div>` : ''}
-      </div>`;
-  } else {
-    backContent = `
-      <div class="back-header">
-        <div class="back-word">${c.word}</div>
-        ${c.phonetic ? `<div class="back-phonetic">${c.phonetic}</div>` : ''}
-        <div class="back-meaning">${c.meaning}</div>
-        <div class="back-vi">${c.vi}</div>
-      </div>
-      <div class="back-body">
-        ${(c.examples||[]).map(e=>`<div class="example-box"><div class="en">"${e.en}"</div><div class="vi">${e.vi}</div></div>`).join('')}
-        ${c.note ? `<div class="note-box">💡 ${c.note}</div>` : ''}
-      </div>`;
-  }
+    </header>
 
-  const html = `
-    <div class="card-scene" onclick="flipCard()">
-      <div class="card-inner" id="cardInner">
-        <div class="card-face card-front">
-          <div class="card-img-wrap">
-            <img src="${imgUrl}" alt="" onerror="this.style.display='none'" loading="lazy">
-            <div class="card-img-overlay"></div>
-            <div class="card-type-badge">${typeLabel}</div>
+    <div class="home-body">
+      <div class="greeting-block">
+        <h1 id="home-greeting">Chào bạn! 👋</h1>
+        <p id="home-subtext">5 phút học hôm nay thôi nào~</p>
+      </div>
+
+      <!-- Streak calendar -->
+      <div class="streak-card">
+        <div class="streak-card-top">
+          <span class="streak-label">Chuỗi ngày học</span>
+          <span class="streak-count" id="streak-display">🔥 0 ngày</span>
+        </div>
+        <div class="week-dots" id="weekDots"></div>
+      </div>
+
+      <!-- Lesson paths -->
+      <div class="lesson-path">
+        <div class="path-section-label">📖 Từ vựng hàng ngày</div>
+
+        <div class="path-row center">
+          <button class="lesson-node active" onclick="startLesson('vocab-basic')" id="node-vocab-basic">
+            <span class="node-icon">🌱</span>
+            <span class="node-label">Cơ bản</span>
+          </button>
+        </div>
+
+        <div class="path-row right">
+          <button class="lesson-node" onclick="startLesson('vocab-daily')" id="node-vocab-daily">
+            <span class="node-icon">🏠</span>
+            <span class="node-label">Sinh hoạt</span>
+          </button>
+        </div>
+
+        <div class="path-row center">
+          <button class="lesson-node" onclick="startLesson('phrase')" id="node-phrase">
+            <span class="node-icon">💬</span>
+            <span class="node-label">Cụm từ</span>
+          </button>
+        </div>
+
+        <div class="path-row left">
+          <button class="lesson-node locked" id="node-grammar">
+            <span class="node-icon">🔒</span>
+            <span class="node-label">Ngữ pháp</span>
+          </button>
+        </div>
+
+        <div class="path-row center">
+          <button class="lesson-node locked" id="node-advanced">
+            <span class="node-icon">🔒</span>
+            <span class="node-label">Nâng cao</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active">🏠<span>Trang chủ</span></button>
+      <button class="nav-item" onclick="showScreen('screen-review')">🗂️<span>Ôn tập</span></button>
+      <button class="nav-item" onclick="showScreen('screen-profile')">👤<span>Hồ sơ</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SCREEN: LESSON
+  ═══════════════════════════════════ -->
+  <div id="screen-lesson" class="screen">
+    <header class="lesson-header">
+      <button class="btn-close" onclick="confirmExit()">✕</button>
+      <div class="lesson-progress-wrap">
+        <div class="lesson-progress-track">
+          <div class="lesson-progress-fill" id="lessonProgress"></div>
+        </div>
+      </div>
+      <div class="hearts-display" id="heartsDisplay">❤️❤️❤️❤️❤️</div>
+    </header>
+
+    <div class="lesson-body" id="lessonBody">
+      <!-- Injected by JS -->
+    </div>
+
+    <div class="lesson-footer" id="lessonFooter">
+      <button class="btn-check" id="btnCheck" disabled onclick="checkAnswer()">Kiểm tra</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SCREEN: RESULT
+  ═══════════════════════════════════ -->
+  <div id="screen-result" class="screen">
+    <div class="result-body">
+      <div class="result-owl" id="resultOwl">🦉</div>
+      <h2 class="result-title" id="resultTitle">Xuất sắc!</h2>
+      <p class="result-sub" id="resultSub">Bài học hoàn thành!</p>
+
+      <div class="result-stats">
+        <div class="result-stat">
+          <div class="result-stat-icon">⭐</div>
+          <div class="result-stat-val" id="resultXP">+0</div>
+          <div class="result-stat-lbl">XP</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-icon">🎯</div>
+          <div class="result-stat-val" id="resultAcc">0%</div>
+          <div class="result-stat-lbl">Chính xác</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-icon">🔥</div>
+          <div class="result-stat-val" id="resultStreak">0</div>
+          <div class="result-stat-lbl">Streak</div>
+        </div>
+      </div>
+
+      <button class="btn-continue" onclick="goHome()">Tiếp tục</button>
+      <button class="btn-retry" onclick="retryLesson()">Làm lại</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       SCREEN: REVIEW (flashcard)
+  ═══════════════════════════════════ -->
+  <div id="screen-review" class="screen">
+    <header class="sub-header">
+      <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+      <h2>Ôn tập flashcard</h2>
+    </header>
+
+    <div class="review-body" id="reviewBody">
+      <div class="flashcard-scene" id="flashcardScene" onclick="flipFlashcard()">
+        <div class="flashcard-inner" id="flashcardInner">
+          <div class="flashcard-front" id="flashcardFront">
+            <div class="fc-tag" id="fcTag">từ vựng</div>
+            <div class="fc-word" id="fcWord">—</div>
+            <div class="fc-phonetic" id="fcPhonetic"></div>
+            <div class="fc-tap-hint">Nhấn để xem nghĩa 👆</div>
           </div>
-          ${frontBody}
-        </div>
-        <div class="card-face card-back">${backContent}</div>
-      </div>
-    </div>`;
-
-  document.getElementById('cardArea').innerHTML = html;
-  document.getElementById('actionBtns').style.display = state.flipped ? 'flex' : 'none';
-  document.getElementById('cardCounter').textContent = `${state.idx + 1} / ${cards.length}`;
-  document.getElementById('prevBtn').disabled = state.idx === 0;
-  document.getElementById('nextBtn').disabled = state.idx >= cards.length - 1;
-  state.flipped = false;
-}
-
-function flipCard() {
-  state.flipped = !state.flipped;
-  const inner = document.getElementById('cardInner');
-  if (inner) inner.classList.toggle('flipped', state.flipped);
-  document.getElementById('actionBtns').style.display = state.flipped ? 'flex' : 'none';
-}
-
-function mark(type) {
-  if (type === 'know') state.sessionKnow++;
-  else state.sessionReview++;
-  nextCard();
-}
-
-function nextCard() {
-  const cards = getFilteredCards();
-  if (state.idx < cards.length - 1) {
-    state.idx++;
-    state.flipped = false;
-    renderCard();
-  } else {
-    markTodayStudied();
-    showCompletion();
-  }
-}
-
-function prevCard() {
-  if (state.idx > 0) {
-    state.idx--;
-    state.flipped = false;
-    renderCard();
-  }
-}
-
-function showCompletion() {
-  const total = getFilteredCards().length;
-  const pct = Math.round(((state.sessionKnow + state.sessionReview) / total) * 100);
-  document.getElementById('progFill').style.width = '100%';
-  document.getElementById('progPct').textContent = '100%';
-  document.getElementById('actionBtns').style.display = 'none';
-  document.getElementById('cardCounter').textContent = '';
-
-  const emojis = ['🎉','✨','🌟','💖','🏆'];
-  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-  const msgs = [
-    'Tuyệt vời! Học xong rồi nè!',
-    'Giỏi lắm! Tiếp tục nhé!',
-    'Hoàn thành bài học hôm nay!',
-    'Xuất sắc! Ngày mai gặp lại nhé!',
-  ];
-  const msg = msgs[Math.floor(Math.random() * msgs.length)];
-
-  document.getElementById('cardArea').innerHTML = `
-    <div class="completion-card">
-      <div class="completion-emoji">${emoji}</div>
-      <h3>${msg}</h3>
-      <p>Streak: 🔥 ${state.streak} ngày liên tiếp</p>
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="num" style="color:var(--mint)">${state.sessionKnow}</div>
-          <div class="lbl">Nhớ rồi ✓</div>
-        </div>
-        <div class="stat-box">
-          <div class="num" style="color:var(--amber)">${state.sessionReview}</div>
-          <div class="lbl">Xem lại ↺</div>
-        </div>
-        <div class="stat-box">
-          <div class="num" style="color:var(--rose)">${total}</div>
-          <div class="lbl">Tổng thẻ</div>
+          <div class="flashcard-back" id="flashcardBack">
+            <div class="fc-meaning" id="fcMeaning"></div>
+            <div class="fc-vi" id="fcVi"></div>
+            <div class="fc-example" id="fcExample"></div>
+            <div class="fc-note" id="fcNote"></div>
+          </div>
         </div>
       </div>
-      <button class="btn-refresh" onclick="newSession()">🔄 Học lại hoặc cập nhật bài mới</button>
-    </div>`;
-}
 
-async function newSession() {
-  state.idx = 0; state.sessionKnow = 0; state.sessionReview = 0;
-  state.todayFetched = ''; // Force re-fetch
-  save();
-  await fetchDailyCards();
-}
+      <div class="fc-actions" id="fcActions" style="display:none">
+        <button class="btn-fc-hard" onclick="fcMark('hard')">😅 Khó</button>
+        <button class="btn-fc-ok" onclick="fcMark('ok')">🙂 Được</button>
+        <button class="btn-fc-easy" onclick="fcMark('easy')">😎 Dễ</button>
+      </div>
 
-// ——— TOPIC FILTER ———
-function setTopic(t) {
-  state.topic = t;
-  state.idx = 0; state.flipped = false;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  renderCard();
-}
+      <div class="fc-nav">
+        <button class="btn-fc-nav" onclick="fcPrev()">←</button>
+        <span class="fc-counter" id="fcCounter">1 / 1</span>
+        <button class="btn-fc-nav" onclick="fcNext()">→</button>
+      </div>
+    </div>
 
-// ——— SETTINGS ———
-function openSettings() {
-  document.getElementById('editName').value = state.name;
-  document.getElementById('editKey').value = state.apiKey;
-  document.getElementById('settingsModal').classList.add('open');
-}
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('open');
-}
-function saveSettings() {
-  state.name = document.getElementById('editName').value.trim() || state.name;
-  state.apiKey = document.getElementById('editKey').value.trim();
-  save();
-  updateHeader();
-  closeSettings();
-}
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="showScreen('screen-home')">🏠<span>Trang chủ</span></button>
+      <button class="nav-item active">🗂️<span>Ôn tập</span></button>
+      <button class="nav-item" onclick="showScreen('screen-profile')">👤<span>Hồ sơ</span></button>
+    </nav>
+  </div>
 
-// ——— BOOT ———
-load();
-if (state.name) {
-  showApp();
-} else {
-  document.getElementById('setupScreen').style.display = 'flex';
-}
-</script>
+  <!-- ═══════════════════════════════════
+       SCREEN: PROFILE
+  ═══════════════════════════════════ -->
+  <div id="screen-profile" class="screen">
+    <header class="sub-header">
+      <button class="btn-back" onclick="showScreen('screen-home')">←</button>
+      <h2>Hồ sơ</h2>
+    </header>
+
+    <div class="profile-body">
+      <div class="profile-avatar">🦉</div>
+      <div class="profile-name" id="profileName">—</div>
+      <div class="profile-level" id="profileLevel">Trình độ A2</div>
+
+      <div class="profile-stats-grid">
+        <div class="profile-stat-box">
+          <div class="psb-val" id="ps-streak">0</div>
+          <div class="psb-lbl">🔥 Streak</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="psb-val" id="ps-xp">0</div>
+          <div class="psb-lbl">⭐ Tổng XP</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="psb-val" id="ps-learned">0</div>
+          <div class="psb-lbl">📖 Từ đã học</div>
+        </div>
+        <div class="profile-stat-box">
+          <div class="psb-val" id="ps-days">0</div>
+          <div class="psb-lbl">📅 Ngày học</div>
+        </div>
+      </div>
+
+      <div class="profile-section-title">Cài đặt</div>
+      <div class="profile-settings">
+        <label class="setting-row">
+          <span>Tên</span>
+          <input type="text" id="settingName" class="setting-input" placeholder="Tên của bạn" />
+        </label>
+        <label class="setting-row">
+          <span>Trình độ</span>
+          <select id="settingLevel" class="setting-input">
+            <option value="A2">A2 – Sơ cấp</option>
+            <option value="B1">B1 – Trung cấp</option>
+            <option value="B2">B2 – Trung cao</option>
+          </select>
+        </label>
+        <button class="btn-save-settings" onclick="saveSettings()">Lưu thay đổi</button>
+      </div>
+
+      <button class="btn-reset" onclick="resetProgress()">🗑️ Xóa tiến độ</button>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="showScreen('screen-home')">🏠<span>Trang chủ</span></button>
+      <button class="nav-item" onclick="showScreen('screen-review')">🗂️<span>Ôn tập</span></button>
+      <button class="nav-item active">👤<span>Hồ sơ</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       OVERLAYS
+  ═══════════════════════════════════ -->
+
+  <!-- Correct/Wrong feedback overlay -->
+  <div class="feedback-overlay" id="feedbackOverlay">
+    <div class="feedback-panel" id="feedbackPanel">
+      <div class="feedback-icon" id="feedbackIcon"></div>
+      <div class="feedback-word" id="feedbackWord"></div>
+      <div class="feedback-explain" id="feedbackExplain"></div>
+      <button class="btn-next-q" id="btnNextQ" onclick="nextQuestion()">Tiếp theo →</button>
+    </div>
+  </div>
+
+  <!-- Exit confirm -->
+  <div class="modal-overlay" id="exitModal">
+    <div class="modal-box">
+      <div class="modal-icon">😢</div>
+      <h3>Bỏ bài học?</h3>
+      <p>Tiến độ bài này sẽ không được lưu.</p>
+      <button class="btn-modal-danger" onclick="exitLesson()">Bỏ</button>
+      <button class="btn-modal-safe" onclick="closeModal('exitModal')">Học tiếp</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
 </body>
 </html>
