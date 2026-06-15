@@ -38,7 +38,7 @@ const VOCAB_BANK = {
    STATE
 ═══════════════════════════════════════════════════════ */
 const DEFAULT_STATE = {
-  name: 'bạn',
+  name: 'Dưa Hấu Nhỏ',
   level: 'A2',
   xp: 0,
   hearts: 5,
@@ -283,7 +283,7 @@ function endLesson(failed = false) {
   document.getElementById('resultXP').textContent = `+${xpEarned}`;
   document.getElementById('resultAcc').textContent = acc + '%';
   document.getElementById('resultStreak').textContent = S.streak;
-  document.getElementById('resultOwl').textContent = failed ? '😢' : acc >= 80 ? '🦉' : '🙂';
+  document.getElementById('resultOwl').textContent = failed ? '😢' : acc >= 80 ? '🐙' : '🙂';
 
   showScreen('screen-result');
 }
